@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Search</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+		<style>
+		div.form {
+			display: block;
+			text-align: center;
+		}
+		
+		form {
+			display: inline-block;
+			text-align: center;
+		}
+		
+		label {
+			margin: auto;
+			display: inline-block;
+			text-align: left;
+		
+		}
+		
+		input[type="text"]  {
+			border-radius: 30px;
+			margin: auto;
+			display: inline-block;
+			text-align: right;
+			margin-top: 275px;
+			min-width: 500px;
+			width: 40vw;
+			height: 43px;
+			border-color: lightgrey;
+			position: relative;
+			text-align: left;
+			padding-left: 10px;
+		}
+		
+
+		#slow-transition:hover {
+		  -webkit-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+		  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+		  transition: box-shadow 50ms;
+		}
+
+		input[type="submit"] {
+			display:block;
+			background-color: #F5F5F5;
+			border-color: #F5F5F5;
+			margin: 10px 0px 0px 0px;
+			position: absolute;
+			text-align: center;
+		}
+		
+		#Search {
+			left: calc(50% - 130px);
+		}
+		
+		#Lucky {
+			left: calc(50%);
+		}
+		
+		.form-group {
+			display: block;
+			text-align: left;
+		}
+		
+		span{
+		display:block;
+		}
+		
+		div.links{
+			border-radius: 10px;
+			margin: auto;
+			display: block;
+			position: absolute; 
+			top: 5px; 
+			right: 5px; 
+			text-align: right;
+		}
+		</style>
+
+	</head>
+    <body>
+		<div class="form">
+			<form id="form" name="form" action="https://www.google.com/search">
+				<input type="text" name="q" id="slow-transition">
+				<input type="submit" id = "Search" value="Google Search" >
+				<input type="submit" id = "Lucky" value="I Feel Lucky" >
+			</form>
+						
+			<div class="links">
+				<span>
+					<a href="../search/index1.html">Google Advanced Search</a>
+				</span>
+				
+				<span>
+					<a href="../search/index2.html">Google Image Search</a>
+				</span>
+			</div>
+		</div>
+    </body>
+	
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+		<script type="text/javascript">
+
+		form.addEventListener("submit",
+		event => {
+			event.preventDefault(); //cancel default form submission handler
+			if(document.activeElement.id == 'Lucky'){
+				location.href = form.action 
+				+ "?"
+				+ Array.from(form.elements).map(eleField => eleField.name 
+				+ "=" 
+				+ encodeURIComponent(eleField.value))[0] + '&btnI';
+			} else {
+				location.href = form.action 
+				+ "?"
+				+ Array.from(form.elements).map(eleField => eleField.name 
+				+ "=" 
+				+ encodeURIComponent(eleField.value))[0];
+			}
+			
+		});
+		</script>
+</html>
+

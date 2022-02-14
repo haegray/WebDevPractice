@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Search</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+		<style>
+		div.form {
+			display: block;
+			text-align: center;
+			position: static;
+		}
+		
+		form {
+			display: block;
+			text-align: center;
+			width: 500px;
+			margin: auto;
+			position: static;
+		}
+	
+		
+		input[type="text"]  {
+			border-radius: 30px;
+			margin: auto;
+			display: block;
+			text-align: right;
+			margin-top: 275px;
+			min-width: 500px;
+			width: 40vw;
+			height: 43px;
+			border-color: lightgrey;
+			text-align: left;
+			padding-left: 10px;
+		}
+		
+
+		#slow-transition:hover {
+		  -webkit-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+		  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+		  transition: box-shadow 50ms;
+		}
+
+		input[type="submit"]{
+			display: inline-block;
+			background-color: #F5F5F5;
+			border-color: #F5F5F5;
+			margin-top: 0px;
+		}
+		
+		
+		#Search {
+			display: inline-block;
+			background-image: url("../search/mag-glass.png");
+			background-color: transparent;
+			background-repeat: no-repeat;
+			background-position: <left-right>;
+			border: none;
+
+			background-size: 30px 30px;
+			height: 30px;
+			width: 30px;
+			text-indent: -9999em;
+			text-transform: uppercase;
+			position: absolute;
+		}
+		
+		span{
+			display:block;
+			position: static;
+		}
+		
+		div.links{
+			border-radius: 10px;
+			margin: auto;
+			position: absolute; 
+			top: 5px; 
+			right: 5px; 
+			text-align: right;
+			position: absolute;
+		}
+		
+		div.search-bar{
+			position: relative;
+		}
+		
+		div.search-button{
+			position: absolute;
+			height: 30px;
+			width: 30px;
+			right:20px;
+			top: 8px;
+		}
+		</style>
+	</head>
+    <body>
+		<div class="form">
+			<form id="form" name="form" action="http://www.images.google.com/images">
+				<div class = "search-bar">
+					<input type="text" name="q" id="slow-transition">
+					<div class = "search-button">
+						<input type="submit" id = "Search" class="button-add">
+					</div>
+				</div>
+			</form>
+		
+		</div>		
+		<div class="links">
+			<span>
+				<a href="../search/index.html">Google Search</a>
+			</span>
+			
+			<span>
+				<a href="../search/index1.html">Google Advanced Search</a>
+			</span>
+		</div>
+	
+    </body>
+</html>

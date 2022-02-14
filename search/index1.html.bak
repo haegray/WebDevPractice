@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Search</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+		<style>
+		div.form {
+			display: block;
+			text-align: center;
+		}
+		
+		form {
+			display: inline-block;
+			text-align: left;
+			overflow: hidden;
+			margin: 20px 0px 0px 0px;
+		}
+		
+		label {
+			margin: auto;
+			display: inline-block;
+			text-align: left;
+			margin: 10px 0px 0px 0px;
+		
+		}
+		
+		input[type="text"]  {
+			margin: auto;
+			display: inline-block;
+			text-align: right;
+			float: right;
+			clear: both;
+			margin: 10px 0px 0px 10px;
+			text-align: left;
+			padding-left: 5px;
+			
+			
+		}
+		
+		#slow-transition:hover {
+		  -webkit-box-shadow: 0 0 5px 0 rgba(137, 196, 244, 0.3) inset;
+		  box-shadow: 0 0 5px 0 rgba(137, 196, 244, 0.3) inset;
+		  transition: box-shadow 50ms;
+		  border-color: rgba(205, 209, 228, 1);
+		}
+		
+		input[type="submit"] {
+			border-radius: 3px;
+			margin: auto;
+			display:block;
+			float: right;
+			clear: both;
+			margin: 10px 0px 0px 0px;
+			padding: 5px 0px 0px 0px;
+			background-color: rgba(30, 139, 195, 1);
+			color: white;
+			border: 0;
+		}
+		
+		.form-group {
+			display: block;
+			text-align: left;
+		}
+		
+		span{
+		display:block;
+		}
+		
+		div.links{
+			border-radius: 10px;
+			margin: auto;
+			display: block;
+			position: absolute; 
+			top: 5px; 
+			right: 5px; 
+			text-align: right;
+		}
+		</style>
+	</head>
+    <body>
+	
+
+				<div class="form">
+					<form action="https://www.google.com/search?">
+						Find pages with...
+						<div class="form-group">
+						<label for="formInput1">all these words:</label>
+						<input type="text" name="as_q" id="slow-transition">
+						</div>
+						
+						<div class="form-group">
+						<label for="formInput2">this exact word or phrase:</label>
+						<input type="text" name="as_epq" id="slow-transition">
+						</div>
+						
+						<div class ="form-group">
+						<label for="formInput3">any of these words:</label>
+						<input type="text" name="as_oq" id="slow-transition">
+						</div>
+						
+						<div class ="form-group">
+						<label for="formInput4">none of these words:</label>
+						<input type="text" name="as_eq" id="slow-transition">
+						</div>
+						
+						<input type="hidden" name="as_nlo" id="formHiddenInput" value = "">
+						<input type="hidden" name="as_nhi" id="formHiddenInput" value = "">
+						<input type="hidden" name="lr" id="formHiddenInput" value = "">
+						<input type="hidden" name="cr" id="formHiddenInput" value = "">
+						
+						<input type="hidden" name="as_qdr" id="formHiddenInput" value = "all">
+						<input type="hidden" name="as_sitesearch" id="formHiddenInput" value = "">
+						<input type="hidden" name="as_occt" id="formHiddenInput" value = "any">
+						<input type="hidden" name="safe" id="formHiddenInput" value="images">
+						<input type="hidden" name="as_filetype" id="formHiddenInput" value="">
+						<input type="hidden" name="tbs" id="formHiddenInput" value="">
+
+						<input type="submit" value="Advanced Search" >
+					</form>
+				</div>
+
+				<div class="links">
+				<span>
+					<a href="../search/index.html">Google Search</a>
+				</span>
+				<span>
+				<a href="../search/index2.html">Google Image Search</a>
+				</span>
+				</div>
+    </body>
+</html>
