@@ -10,6 +10,8 @@
     <ul>
         {% for entry in entries %}
             <li> <a href="{% url 'TITLE' entry %}">{{entry}}</a></li>
+        {% empty %}
+            <p> No encyclopedia entries found.</p>
         {% endfor %}
     </ul>
 
