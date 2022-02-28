@@ -3,6 +3,10 @@ body {
     background-color: white;
 }
 
+html {
+    overflow: scroll;
+  }
+
 code {
     white-space: pre;
 }
@@ -35,4 +39,19 @@ textarea {
 
 .sidebar h2 {
     margin-top: 5px;
+}
+
+.new_entry_title{
+    display: block;
+    margin-bottom: 10px;
+    width: 500px;
+}
+.add_new{
+    height: 500px;
+    width: 500px;
+    display: inline-block;
+}
+
+.submit_button{
+    display: block;
 }

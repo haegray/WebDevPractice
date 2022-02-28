@@ -34,3 +34,19 @@ def TITLE(request, title):
     else:
          return HttpResponseNotFound("Encyclopedia entry does not exist.")
 
+def add(request):
+    if request.method == "POST":
+        title = util.get_entry(request.POST.get('z'))
+        if title is not None:
+            return HttpResponseNotFound("This page already exists.")
+        else:
+            title = request.POST.get('z')
+            content = request.POST.get('q')
+            util.save_entry(title, content)
+            return render(request, "encyclopedia/index.html", {
+                    "entries": util.list_entries()
+                })
+    else:
+        return render(request, "encyclopedia/add.html")
+    
+
