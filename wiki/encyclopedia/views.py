@@ -55,6 +55,8 @@ def add(request):
         else:
             title = request.POST.get('z')
             content = request.POST.get('q')
+            if not content.startswith("#"):
+                content = "#" + title +" \n" + content
             util.save_entry(title, content)
             return render(request, "encyclopedia/index.html", {
                     "entries": util.list_entries()
