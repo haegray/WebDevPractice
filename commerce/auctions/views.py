@@ -4,11 +4,23 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, Listing, Bid
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+
+    listings = Listing.objects.all()
+    #names = [listing.title for listing in listings]
+    #images = [listing.photo for listing in listings]
+    #bids = [listing.bids.all() for listing in listings]
+    #values = zip(names,bids)
+    #function that fills the lists.
+    
+    #context = {'listings': values }
+
+    return render(request, "auctions/index.html", {
+        "listings": listings
+    })
 
 
 def login_view(request):
