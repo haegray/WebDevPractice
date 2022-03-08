@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -21,6 +21,40 @@ def index(request):
     return render(request, "auctions/index.html", {
         "listings": listings
     })
+
+def listing(request, title):
+    listing = Listing.objects.get(title = title)
+    bids = [bid for bid in listing.bids.all()]
+   
+    return render(request, "auctions/listing.html", {
+        "listing": listing,
+        "bids": bids
+    })
+
+def add_listing(request):
+    if request.method == "POST":
+        try:
+            listing = Listing.objects.get(title = request.POST.get('title'))
+            return HttpResponseNotFound("This item already exists.")
+        except Listing.DoesNotExist:
+            title = request.POST.get('title')
+            current_price = request.POST.get('current_price')
+            owned_by = User.objects.get(username = request.POST.get('owned_by'))
+            print("request user ", request.user)
+            print("owned by", owned_by)
+            if str(request.user) != str(owned_by):
+                return HttpResponseNotFound("You can only post your own listing.")
+            description = request.POST.get('description')
+            photo = request.FILES.get('photo')
+            l = Listing(title=title, current_price=current_price, owned_by=owned_by, description=description, photo=photo)
+            l.save()
+            listings = Listing.objects.all()
+            return render(request, "auctions/index.html", {
+            "listings": listings
+            })
+    else:
+        return render(request, "auctions/add_listing.html")
+    
 
 
 def login_view(request):

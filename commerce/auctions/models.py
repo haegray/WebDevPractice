@@ -30,4 +30,4 @@ class Bid(models.Model):
     
 
     def __str__(self):
-        return f"<Bid {self.id}: {self.bidder} bids {self.bid} on {self.listed_item}"
+        return f"<Bid {self.id}: {self.bidder} bids {self.bid} on {self.listed_item.title}"
