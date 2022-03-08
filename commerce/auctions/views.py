@@ -4,20 +4,56 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render
 from django.urls import reverse
 
+from django.forms import ModelForm
+from django import forms
+
+
 from .models import User, Listing, Bid
 
+class ListingForm(ModelForm):
+    class Meta:
+        # write the name of models for which the form is made
+        model = Listing      
+ 
+        # Custom fields
+        fields = ["title", "current_price", "owned_by", "description", "photo"]
+ 
+    def __init__(self, *args, **kwargs):
+         self.user = kwargs.pop('user',None)
+         super(ListingForm, self).__init__(*args, **kwargs)
+
+    # this function will be used for the validation
+    def clean(self):
+ 
+        # data from the form is fetched using super function
+        super(ListingForm, self).clean()
+         
+        # extract the username and text field from the data
+        title = self.cleaned_data.get('title')
+        current_price = self.cleaned_data.get('current_price')
+        owned_by = self.cleaned_data.get('owned_by')
+        description = self.cleaned_data.get('description')
+        photo = self.cleaned_data.get('photo')
+
+ 
+        # conditions to be met for the username length
+        print(title)
+        if len(title) < 1:
+            self._errors['username'] = self.error_class([
+                'Minimum 1 character required'])
+        print(current_price)
+        if current_price <1:
+            self._errors['current_price'] = self.error_class([
+                'Price must be above 0'])
+        if str(self.user) != str(owned_by):
+                self._errors['owned_by'] = self.error_class([
+                "You can only post your own listing."])
+        print(self.cleaned_data)
+        # return any errors if found
+        return self.cleaned_data
 
 def index(request):
-
     listings = Listing.objects.all()
-    #names = [listing.title for listing in listings]
-    #images = [listing.photo for listing in listings]
-    #bids = [listing.bids.all() for listing in listings]
-    #values = zip(names,bids)
-    #function that fills the lists.
-    
-    #context = {'listings': values }
-
     return render(request, "auctions/index.html", {
         "listings": listings
     })
@@ -33,27 +69,28 @@ def listing(request, title):
 
 def add_listing(request):
     if request.method == "POST":
-        try:
-            listing = Listing.objects.get(title = request.POST.get('title'))
-            return HttpResponseNotFound("This item already exists.")
-        except Listing.DoesNotExist:
-            title = request.POST.get('title')
-            current_price = request.POST.get('current_price')
-            owned_by = User.objects.get(username = request.POST.get('owned_by'))
-            print("request user ", request.user)
-            print("owned by", owned_by)
-            if str(request.user) != str(owned_by):
-                return HttpResponseNotFound("You can only post your own listing.")
-            description = request.POST.get('description')
-            photo = request.FILES.get('photo')
-            l = Listing(title=title, current_price=current_price, owned_by=owned_by, description=description, photo=photo)
-            l.save()
-            listings = Listing.objects.all()
-            return render(request, "auctions/index.html", {
-            "listings": listings
+
+            form = ListingForm(request.POST, request.FILES,user=request.user)
+            if form.is_valid():
+                print("Hello")
+                title = form.cleaned_data['title']
+                if Listing.objects.filter(title=title).exists():
+                    return HttpResponseNotFound("This listing already exists.")
+                else:
+                    form.save()
+                    listings = Listing.objects.all()
+                return render(request, "auctions/index.html", {
+                "listings": listings
+                })
+            else:
+                return render(request, "auctions/add_listing.html",{
+                "form": form
             })
     else:
-        return render(request, "auctions/add_listing.html")
+        return render(request, "auctions/add_listing.html",{
+            "form": ListingForm()
+        })
+
     
 
 
