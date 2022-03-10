@@ -1,7 +1,30 @@
 {% extends "auctions/layout.html" %}
 
+{% block bid %}
+    {% if current_user != listing.owned_by %}
+            <li class="nav-item">
+                <form action="{% url 'listing' listing.title%}" method="post">
+                    {% csrf_token %}
+                    {{ csrf_input }}
+                    {% for field in form %}
+
+                        {% if not field.is_hidden %}
+                        <div class="fieldWrapper">
+                            {{ field.label_tag }} {{ field }} <input type = "submit"> {{ field.errors}}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                </form> 
+            </li>
+    {% endif %}
+{% endblock %}
+
+
 {% block body %}
 <h1>{{listing.title}}</h1>
+
+
     <img src="{{ listing.photo.url }}" alt="img" width="80"> <br/> 
     {{listing.description}} <br/>
     Current Price: {{listing.current_price}}<br/> 
