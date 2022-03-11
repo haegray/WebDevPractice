@@ -1,5 +1,14 @@
 {% extends "auctions/layout.html" %}
 
+{% block close %}
+    {% if current_user == listing.owned_by %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url listing listing.title%}">Close Listing</a>
+        </li>
+    {% endif %}
+
+{% endblock %}
+
 {% block watchlist %}
     {% if flag %}
         <li class="nav-item">

@@ -8,7 +8,7 @@ from django.forms import ModelForm
 from django import forms
 
 
-from .models import User, Listing, Bid
+from .models import User, Listing, Bid, Category
 
 class ListingForm(ModelForm):
     class Meta:
@@ -105,6 +105,17 @@ def index(request):
     listings = Listing.objects.all()
     return render(request, "auctions/index.html", {
         "listings": listings
+    })
+
+def categories(request, title):
+    if title != 'all':
+        listings = Listing.objects.filter(category__title = title)
+        return render(request, "auctions/index.html", {
+        "listings": listings
+    })
+    categories = Category.objects.all()
+    return render(request, "auctions/categories.html", {
+        "categories": categories
     })
 
 def listing(request, title):
