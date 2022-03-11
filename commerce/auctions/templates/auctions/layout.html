@@ -26,11 +26,18 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'add_listing' %}">Add Listing</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'watchlist' 'watchlist' %}">Watchlist</a>
+                </li>
             
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
                 </li>
 
+                {% block watchlist %}
+                {% endblock %}
+            
                 {% block bid %}
                 {% endblock %}
             {% else %}

@@ -2,9 +2,10 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-    {% for listing in listings %}
-        <li> <img src="{{ listing.photo.url }}" alt="img" width="80"> <a href ="{% url 'listing' listing.title %}">{{listing.title}}</a> <br/> {{listing.description}} {{listing.current_price}} </li>
-            
-    {% endfor %}
-
+        <ul>
+            {% for listing in listings %}
+                <li> <img src="{{ listing.photo.url }}" alt="img" width="80"> <a href ="{% url 'listing' listing.title %}">{{listing.title}}</a> <br/> {{listing.description}} <br/> Current Price: {{listing.current_price}} </li>
+                    
+            {% endfor %}
+        </ul>
 {% endblock %}

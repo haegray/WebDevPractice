@@ -1,9 +1,22 @@
 {% extends "auctions/layout.html" %}
 
+{% block watchlist %}
+    {% if flag %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'watchlist' listing.title %}">Remove from Watchlist</a>
+        </li>
+    {% else %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'watchlist' listing.title %}">Add to Watchlist</a>
+        </li>
+    {% endif %}
+{% endblock %}
+
+
 {% block bid %}
     {% if current_user != listing.owned_by %}
             <li class="nav-item">
-                <form action="{% url 'listing' listing.title%}" method="post">
+                <form action="{% url 'listing' listing.title %}" method="post">
                     {% csrf_token %}
                     {{ csrf_input }}
                     {% for field in form %}

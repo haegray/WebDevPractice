@@ -46,6 +46,9 @@ class ListingForm(ModelForm):
         if str(self.user) != str(owned_by):
                 self._errors['owned_by'] = self.error_class([
                 "You can only post your own listing."])
+        if title == 'watchlist':
+                self._errors['title'] = self.error_class([
+                "Forbidden title."])
         print(self.cleaned_data)
         # return any errors if found
         return self.cleaned_data
@@ -109,9 +112,12 @@ def listing(request, title):
     user = User.objects.get(username = request.user.username)
     bids = Bid.objects.filter(listed_item=listing)
 
+    if user.watchlist.filter(title=listing.title).exists():
+        flag = True
+    else:
+        flag = False
     if request.method == "POST":
         form = BidForm(request.POST, user=user, listed_item=listing)
-
 
         if form.is_valid():
             bid = form.cleaned_data['bid']
@@ -126,7 +132,8 @@ def listing(request, title):
                 "form": BidForm(user=request.user, listed_item = listing),
                 "listing": listing,
                 "bids": bids,
-                "current_user": User.objects.get(username=request.user)
+                "current_user": User.objects.get(username=request.user),
+                "flag": flag
             })
         else:
             print("Nope")
@@ -134,18 +141,34 @@ def listing(request, title):
                 "form": form,
                 "listing": listing,
                 "bids": bids,
-                "current_user": request.user
+                "current_user": request.user,
+                "flag": flag
             })
     else:
-        print("Listing owned by ", listing.owned_by)
-        print("user ", request.user)
         return render(request, "auctions/listing.html", {
             "form": BidForm(user=request.user, listed_item = listing),
             "listing": listing,
             "bids": bids,
-            "current_user": User.objects.get(username=request.user)
+            "current_user": User.objects.get(username=request.user),
+            "flag": flag
         })
 
+def watchlist(request, title):
+    current_user = User.objects.get(username = request.user.username)
+
+    if(title != 'watchlist'): 
+        listing = Listing.objects.get(title=title)
+        if current_user.watchlist.filter(title=listing.title).exists():
+            current_user.watchlist.remove(listing)
+        else:
+            current_user.watchlist.add(listing)
+    watchlist = []
+    for item in current_user.watchlist.all():
+        watchlist.append((item, item.bid_items.all().filter(bidder=current_user)))
+    return render(request, "auctions/watchlist.html",{
+            "watchlist": watchlist,
+
+        })
 
 
 def add_listing(request):
