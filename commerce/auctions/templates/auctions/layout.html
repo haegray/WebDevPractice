@@ -11,7 +11,7 @@
         <h1>Auctions</h1>
         <div>
             {% if user.is_authenticated %}
-                Signed in as <strong>{{ user.username }}</strong>.
+                Signed in as <strong>{{ user.username }}</strong>: {{user.balance}} GP.
             {% else %}
                 Not signed in.
             {% endif %}
@@ -27,28 +27,19 @@
                     <a class="nav-link" href="{% url 'add_listing' %}">Add Listing</a>
                 </li>
 
-                {% block close_listing %}
-                {% endblock %}
-
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'watchlist' 'watchlist' %}">Watchlist</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'categories' 'all'%}">Categories</a>
+                    <a class="nav-link" href="{% url 'categories' 'all' %}">Categories</a>
                 </li>
             
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
                 </li>
 
-                {% block watchlist %}
-                {% endblock %}
-            
-                {% block bid %}
-                {% endblock %}
-
-
+       
             {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'login' %}">Log In</a>

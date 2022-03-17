@@ -10,13 +10,20 @@ from django import forms
 
 from .models import User, Listing, Bid, Category
 
+ACTIVE = "active"
+INACTIVE = "inactive"
+STATUS = [
+    (ACTIVE, "active"),
+    (INACTIVE, "inactive"),
+]
+
 class ListingForm(ModelForm):
     class Meta:
         # write the name of models for which the form is made
         model = Listing      
  
         # Custom fields
-        fields = ["title", "current_price", "owned_by", "description", "photo"]
+        fields = ["title", "current_price", "owned_by", "description", "photo", "category"]
  
     def __init__(self, *args, **kwargs):
          self.user = kwargs.pop('user',None)
@@ -87,14 +94,17 @@ class BidForm(ModelForm):
 
         # conditions to be met for the username length
         if self.cleaned_data['bid'] < self.listed_item.current_price:
-            print("price")
             self._errors['bid'] = self.error_class([
                 'Bid must be above current price.'])
 
-        if self.listed_item.bids.filter(bid=self.cleaned_data['bid'], bidder=self.cleaned_data['bidder']).exists():
+        if self.listed_item.bid_items.filter(bid=self.cleaned_data['bid'], bidder=self.cleaned_data['bidder']).exists():
             self._errors['bid'] = self.error_class([
                 'Cannot make the same bid on one listing.' 
             ])
+
+        if self.user.balance < self.cleaned_data['bid']:
+            self._errors['bid'] = self.error_class([
+                'Cannot bid above balance.'])
 
         print(self.cleaned_data)
         print(self.errors)
@@ -108,6 +118,7 @@ def index(request):
     })
 
 def categories(request, title):
+    print("Title is ", title)
     if title != 'all':
         listings = Listing.objects.filter(category__title = title)
         return render(request, "auctions/index.html", {
@@ -118,51 +129,63 @@ def categories(request, title):
         "categories": categories
     })
 
-def listing(request, title):
+def listing(request, title, status):
     listing = Listing.objects.get(title = title)
     user = User.objects.get(username = request.user.username)
     bids = Bid.objects.filter(listed_item=listing)
-
+    
     if user.watchlist.filter(title=listing.title).exists():
         flag = True
     else:
         flag = False
-    if request.method == "POST":
-        form = BidForm(request.POST, user=user, listed_item=listing)
 
-        if form.is_valid():
-            bid = form.cleaned_data['bid']
-            instance = form.save(commit=False)
-            instance.bidder = request.user
-            instance.listed_item = listing
-            instance.save()
-
-            listing.current_price = bid
-            listing.save()
-            return render(request, "auctions/listing.html", {
-                "form": BidForm(user=request.user, listed_item = listing),
-                "listing": listing,
-                "bids": bids,
-                "current_user": User.objects.get(username=request.user),
-                "flag": flag
-            })
-        else:
-            print("Nope")
-            return render(request, "auctions/listing.html", {
-                "form": form,
-                "listing": listing,
-                "bids": bids,
-                "current_user": request.user,
-                "flag": flag
-            })
+    print("Listing status: ", listing.get_status_display())
+    print("Status: ", status)
+    if listing.status ==  'active' and status == 'inactive':
+        print("Hello is it me you're looking for?")
+        listing.status = status
+        listing.save()
+        print("Listing ", listing)
     else:
-        return render(request, "auctions/listing.html", {
-            "form": BidForm(user=request.user, listed_item = listing),
-            "listing": listing,
-            "bids": bids,
-            "current_user": User.objects.get(username=request.user),
-            "flag": flag
-        })
+        
+        if request.method == "POST":
+            form = BidForm(request.POST, user=user, listed_item=listing)
+
+            if form.is_valid():
+                bid = form.cleaned_data['bid']
+                instance = form.save(commit=False)
+                instance.bidder = request.user
+                instance.listed_item = listing
+                instance.save()
+
+                listing.current_price = bid
+                listing.highest_bidder = request.user
+                listing.save()
+                return render(request, "auctions/listing.html", {
+                    "form": BidForm(user=request.user, listed_item = listing),
+                    "listing": listing,
+                    "bids": bids,
+                    "current_user": User.objects.get(username=request.user.username),
+                    "flag": flag,
+                    "status": listing.status
+                })
+            else:
+                return render(request, "auctions/listing.html", {
+                    "form": form,
+                    "listing": listing,
+                    "bids": bids,
+                    "current_user": request.user,
+                    "flag": flag,
+                    "status": listing.status
+                })
+    return render(request, "auctions/listing.html", {
+        "form": BidForm(user=request.user, listed_item = listing),
+        "listing": listing,
+        "bids": bids,
+        "current_user": User.objects.get(username=request.user.username),
+        "flag": flag,
+        "status": listing.status
+    })
 
 def watchlist(request, title):
     current_user = User.objects.get(username = request.user.username)
@@ -214,9 +237,11 @@ def login_view(request):
 
         # Attempt to sign user in
         username = request.POST["username"]
+        print("Username ", username)
         password = request.POST["password"]
+        print("Password ", password)
         user = authenticate(request, username=username, password=password)
-
+        print("User is ", user)
         # Check if authentication successful
         if user is not None:
             login(request, user)

@@ -13,6 +13,12 @@ class User(AbstractUser, models.Model):
 
 
 class Listing(models.Model):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    STATUS = [
+        (ACTIVE, "active"),
+        (INACTIVE, "inactive"),
+    ]
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=64)
     current_price = models.IntegerField(default=0)
@@ -20,10 +26,11 @@ class Listing(models.Model):
     description = models.CharField(max_length=64, default="")
     photo = models.ImageField(upload_to = 'media',null=True, blank=True)
     category = models.ManyToManyField('Category', blank=True, related_name="categories")
-    active = models.BooleanField(default=True)
+    status = models.CharField(max_length=8, choices=STATUS, default=ACTIVE)
+    highest_bidder = models.ForeignKey(User, on_delete=models.CASCADE, related_name="highest_bidder", null=True, blank=True)
 
     def __str__(self):
-        return f"{self.title}: {self.description} Current Price: {self.current_price} "
+        return f"{self.title}: {self.description} Current Price: {self.current_price} Status: {self.status} "
 
 class Bid(models.Model):
     id = models.AutoField(primary_key=True)
@@ -34,10 +41,29 @@ class Bid(models.Model):
     
 
     def __str__(self):
-        return f"<Bid {self.id}: {self.bidder} bids {self.bid} on {self.listed_item.title}"
+        return f"Bid {self.id}: {self.bidder} bids {self.bid} on {self.listed_item.title}"
 
 class Category(models.Model):
+
+    HOMEGOODS = "Home Goods"
+    TECHNOLOGY = "Technology"
+    MKITEMS = "Mario Kart Items"
+    DECOR = "Decor"
+    MISCELLANEOUS = "Misc"
+
+    CATEGORY = [
+        (HOMEGOODS, "Home Goods"),
+        (TECHNOLOGY, "Technology"),
+        (MKITEMS, "Mario Kart Items"),
+        (DECOR, "Decor"),
+        (MISCELLANEOUS, "Misc")
+    ]
+
+
     id = models.AutoField(primary_key=True)
     icon = models.ImageField(upload_to = 'media',null=True, blank=True)
-    title = models.CharField(max_length=64, default='General')
+    title = models.CharField(max_length=64, choices=CATEGORY, default=MISCELLANEOUS)
     description = models.CharField(max_length=64)
+
+    def __str__(self):
+        return f" {self.title}"
