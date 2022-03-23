@@ -1,0 +1,16 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    Add Comment
+{% endblock %}
+
+{% block body %}
+
+    <h1>Add comment</h1>
+    <form action="{% url 'comment' title %}" method="post" >
+        {% csrf_token %}
+        {{form.as_table}}
+        <input class = "submit_button" type = "submit">
+    </form>
+
+{% endblock %}

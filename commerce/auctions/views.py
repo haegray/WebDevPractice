@@ -8,7 +8,8 @@ from django.forms import ModelForm
 from django import forms
 
 
-from .models import User, Listing, Bid, Category
+from .models import User, Listing, Bid, Category, Comments
+import datetime
 
 ACTIVE = "active"
 INACTIVE = "inactive"
@@ -18,6 +19,7 @@ STATUS = [
 ]
 
 class ListingForm(ModelForm):
+    description = forms.CharField(widget=forms.Textarea(attrs={'rows': 1, 'cols': 40}))
     class Meta:
         # write the name of models for which the form is made
         model = Listing      
@@ -28,6 +30,8 @@ class ListingForm(ModelForm):
     def __init__(self, *args, **kwargs):
          self.user = kwargs.pop('user',None)
          super(ListingForm, self).__init__(*args, **kwargs)
+         for field in self.fields:
+             self.fields[field].widget.attrs.update({'style': 'text-align: center; width:250px; margin-top: 10px; float:right; margin-right:70vw; display: inline-block;','class': 'field'})
 
     # this function will be used for the validation
     def clean(self):
@@ -111,6 +115,43 @@ class BidForm(ModelForm):
         # return any errors if found
         return self.cleaned_data
 
+class CommentForm(ModelForm):
+    comment = forms.CharField(widget=forms.Textarea)
+    class Meta:
+        # write the name of models for which the form is made
+        model = Comments     
+ 
+        # Custom fields
+        fields = '__all__'
+        widgets = {
+            'commenter': forms.HiddenInput(), "listed_item": forms.HiddenInput()
+        }
+ 
+    def __init__(self, *args, **kwargs):
+         self.user = kwargs.pop('commenter', None)
+         self.listed_item = kwargs.pop('listed_item', None)
+         super(CommentForm, self).__init__(*args, **kwargs)
+
+    # this function will be used for the validation
+    def clean(self):
+        comments = Comments.objects.filter(listed_item=self.listed_item)
+ 
+        # data from the form is fetched using super function
+        super(CommentForm, self).clean()
+         
+        # extract the username and text field from the data
+        comment = self.cleaned_data.get('comment')
+        if self.listed_item.comments.filter(comment=comment, commenter=self.user, listed_item=self.listed_item).exists():
+            self._errors['comment'] = self.error_class([
+                'Cannot spam comments.' 
+            ])
+
+        commenter = self.user
+        listed_item = self.listed_item
+        time_stamp = datetime.datetime.now()
+
+        return self.cleaned_data
+
 def index(request):
     listings = Listing.objects.all()
     return render(request, "auctions/index.html", {
@@ -133,6 +174,7 @@ def listing(request, title, status):
     listing = Listing.objects.get(title = title)
     user = User.objects.get(username = request.user.username)
     bids = Bid.objects.filter(listed_item=listing)
+    comments = Comments.objects.filter(listed_item=listing)
     
     if user.watchlist.filter(title=listing.title).exists():
         flag = True
@@ -142,10 +184,18 @@ def listing(request, title, status):
     print("Listing status: ", listing.get_status_display())
     print("Status: ", status)
     if listing.status ==  'active' and status == 'inactive':
-        print("Hello is it me you're looking for?")
         listing.status = status
         listing.save()
-        print("Listing ", listing)
+
+        ol = User.objects.get(username = listing.owned_by)
+        ol.balance = ol.balance + listing.current_price
+        ol.save()
+
+        hb = User.objects.get(username = listing.highest_bidder.username)
+        hb.balance = hb.balance - listing.current_price
+        hb.save()
+
+
     else:
         
         if request.method == "POST":
@@ -167,7 +217,8 @@ def listing(request, title, status):
                     "bids": bids,
                     "current_user": User.objects.get(username=request.user.username),
                     "flag": flag,
-                    "status": listing.status
+                    "status": listing.status,
+                    "comments": comments
                 })
             else:
                 return render(request, "auctions/listing.html", {
@@ -176,7 +227,8 @@ def listing(request, title, status):
                     "bids": bids,
                     "current_user": request.user,
                     "flag": flag,
-                    "status": listing.status
+                    "status": listing.status,
+                    "comments": comments
                 })
     return render(request, "auctions/listing.html", {
         "form": BidForm(user=request.user, listed_item = listing),
@@ -184,7 +236,8 @@ def listing(request, title, status):
         "bids": bids,
         "current_user": User.objects.get(username=request.user.username),
         "flag": flag,
-        "status": listing.status
+        "status": listing.status,
+        "comments": comments
     })
 
 def watchlist(request, title):
@@ -229,7 +282,43 @@ def add_listing(request):
             "form": ListingForm()
         })
 
-    
+def comment(request, title):
+    if request.method == "POST":
+        listing = Listing.objects.get(title = title)
+        form = CommentForm(request.POST, commenter=request.user, listed_item=listing)
+        bids = Bid.objects.filter(listed_item=listing)
+        comments = Comments.objects.filter(listed_item=listing)
+
+        if request.user.watchlist.filter(title=listing.title).exists():
+            flag = True
+        else:
+            flag = False
+
+        print(form.is_valid())
+        print(form.errors)
+
+        if form.is_valid():
+            comment = form.cleaned_data.get('comment')
+            instance = form.save(commit=False)
+            instance.commenter = request.user
+            instance.listed_item = listing
+            instance.save()
+
+        return render(request, "auctions/listing.html", {
+                    "form": BidForm(user=request.user, listed_item = listing),
+                    "listing": listing,
+                    "bids": bids,
+                    "current_user": User.objects.get(username=request.user.username),
+                    "flag": flag,
+                    "status": listing.status,
+                    "comments": comments
+                })
+    else:
+        return render(request, "auctions/comment.html", {
+            "title": title,
+            "form": CommentForm()
+        })
+     
 
 
 def login_view(request):

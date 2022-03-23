@@ -25,6 +25,12 @@
         {% endif %}
     {% endblock %}
 
+    {% block comment %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'comment' listing.title %}">Comment</a>
+        </li>
+    {% endblock %}
+
     {% block bid %}
         {% if current_user != listing.owned_by and listing.status == "active" %}
                 <li class="nav-item">
@@ -61,5 +67,13 @@
         <li>{{bid.bidder}}: {{bid.bid}}</li><br/>
     {% endfor %}
     </ul>
+    <br/>
+    <ul>
+        <b> Comments </b>
+    {% for comment in comments %}
+        <li>{{comment.time_stamp}}<br/>{{comment.commenter}}: {{comment.comment}}</li><br/>
+    {% endfor %}
+    </ul>
+
 
 {% endblock %}

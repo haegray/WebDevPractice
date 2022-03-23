@@ -1,6 +1,5 @@
 {% extends "auctions/layout.html" %}
 
-
 {% block title %}
     New Listing
 {% endblock %}
@@ -8,10 +7,23 @@
 {% block body %}
 
     <h1>Add listing</h1>
+    <br/>
     <form action="{% url 'add_listing' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{form}}
-        <input class = "submit_button" type = "submit">
-    </form>
+        {{ csrf_input }}
+        {% for field in form %}
+
+            {% if not field.is_hidden %}
+            <div class="fieldWrapper">
+                <label class="label" for="{{ form.field.id_for_label }}"> {{field.label_tag}}</label>
+                    {{ field }}  {{ field.errors}} 
+            </div>
+            {% endif %}
+        {% endfor %}
+            <br/>
+            <br/>
+            <br/>
+        <input type="submit" >
+    </form> 
 
 {% endblock %}
