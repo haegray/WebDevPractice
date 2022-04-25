@@ -1,0 +1,12 @@
+{% extends "network/layout.html" %}
+
+
+{% block body %}
+
+    <ul>
+        {% for post in posts %}
+            <li> <img src="{{ post.poster.photo.url }}" alt="img" width="80"> <a href ="{% url 'profile' %}">{{post.poster}}</a> <br/> {{post.post}} <br/> {{post.timestamp}} </li>  
+        {% endfor %}
+    </ul>
+
+{% endblock %}

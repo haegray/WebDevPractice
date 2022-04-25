@@ -1,0 +1,18 @@
+{% extends "network/layout.html" %}
+
+
+{% block body %}
+
+    <form action="{% url 'index' %}" method="post" >
+        {% csrf_token %}
+        {{form.as_table}}
+        <input class = "submit_button" type = "submit">
+    </form>
+
+    <ul>
+        {% for post in feed %}
+            <li> <img src="{{ post.poster.photo.url }}" alt="img" width="80"> <a href ="{% url 'profile' %}">{{post.poster}}</a> <br/> {{post.post}} <br/> {{post.timestamp}} </li>  
+        {% endfor %}
+    </ul>
+    Page {{ feed.number }} of {{ feed.paginator.num_pages }}.
+{% endblock %}
