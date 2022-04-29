@@ -1,18 +1,51 @@
 {% extends "network/layout.html" %}
-
+{% load static %}
 
 {% block body %}
 
-    <form action="{% url 'index' %}" method="post" >
-        {% csrf_token %}
-        {{form.as_table}}
-        <input class = "submit_button" type = "submit">
-    </form>
+{% if user.is_authenticated %}
 
+<div id="tweets-view">
     <ul>
-        {% for post in feed %}
-            <li> <img src="{{ post.poster.photo.url }}" alt="img" width="80"> <a href ="{% url 'profile' %}">{{post.poster}}</a> <br/> {{post.post}} <br/> {{post.timestamp}} </li>  
+        {% for post, liked in feed %}
+        <div class="container" id = "{{post.id}}"}>
+            <div class="row">
+                <div class="col-6">
+                    <img src="{{ post.poster.photo.url }}" alt="img" width="80"> <a href ="{% url 'profile' %}">{{post.poster}}</a> <br/>
+                </div>
+                <div class="col-6">
+                    {{post.time_stamp}} 
+                </div>
+            </div>
+            <div class="row">{{post.post}}</div>
+            <div class="row">
+                {% if not liked %}
+                    <label for="like-button" id="label-like-button"><input type="checkbox" id="like-button">&#9829</label>
+                {% else %}
+                    <label for="like-button" id="label-like-button" class="checked"><input type="checkbox" id="like-button">&#9829</label>
+                {% endif %}
+            </div>
+        </div> 
         {% endfor %}
     </ul>
     Page {{ feed.number }} of {{ feed.paginator.num_pages }}.
+</div>
+    
+
+
+
+<div id="compose-view">
+<form action="{% url 'index' %}" method="post" >
+    {% csrf_token %}
+    {{form.as_table}}
+    <input class = "submit_button" type = "submit">
+</form>
+</div>
+{% endif %}
+
 {% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/network.js' %}"></script>
+{% endblock %}
+

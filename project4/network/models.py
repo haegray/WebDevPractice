@@ -17,9 +17,17 @@ class Post(models.Model):
     poster = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="posts")
     post = models.CharField(max_length=128)
     time_stamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-
+    
     def __str__(self):
-        return f" {self.poster}: {self.post} at {self.time_stamp}"
+        return f" {self.id} -- {self.poster}: {self.post} at {self.time_stamp}"
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "poster": self.poster.username,
+            "post": self.post,
+            "time_stamp": self.time_stamp.strftime("%b %d %Y, %I:%M %p"),
+        }
 
 class Like(models.Model):
 
