@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from django.forms import ModelForm
+from django.forms import ModelForm, Textarea
 from django import forms
 import datetime
 import json
@@ -18,7 +18,7 @@ from django.core.files.storage import FileSystemStorage
 from django.views.decorators.csrf import csrf_exempt
 
 class PostForm(ModelForm):
-    post = forms.CharField(widget=forms.Textarea)
+    post = forms.CharField(widget=forms.Textarea, label='')
     class Meta:
         # write the name of models for which the form is made
         model = Post   
@@ -26,7 +26,8 @@ class PostForm(ModelForm):
         # Custom fields
         fields = '__all__'
         widgets = {
-            'poster': forms.HiddenInput()
+            'poster': forms.HiddenInput(),
+            'num_likes': forms.HiddenInput()
         }
  
     def __init__(self, *args, **kwargs):
@@ -58,8 +59,7 @@ def index(request):
         form = PostForm(request.POST, user=request.user)
         if form.is_valid():
             form.save()
-        print(form.is_valid())
-        print(form.errors)
+        form = PostForm()
 
     p = []
     print("Request user id is ", request.user.id)
@@ -67,12 +67,13 @@ def index(request):
         user = User.objects.get(username = request.user)
         feed_following = user.following
         feed = [Post.objects.filter(poster=user) for user in feed_following.all()] + list(Post.objects.filter(poster=request.user))
-        feed = sorted(feed, key=lambda x: x.time_stamp)
+        feed = sorted(feed, key=lambda x: x.time_stamp, reverse=True)
         feed_likes = [Like.objects.filter(post=post, liker=request.user).exists() for post in feed]
         feed = list(zip(feed, feed_likes))
 
-        p = Paginator(feed, 2)
-        feed = p.get_page(1)
+        p = Paginator(feed, 4)
+        page_number = request.GET.get('page')
+        feed = p.get_page(page_number)
         
     return render(request, "network/index.html", {
         "feed": feed,
@@ -99,11 +100,17 @@ def posts(request, post_id):
                 like = Like.objects.get(liker=request.user, post = post)
                 print("delete")
                 like.delete()
+                post.num_likes -= 1
+                post.save()
             except Like.DoesNotExist:
                 new_like = Like(liker=request.user, post=post)
                 new_like.save()
+                post.num_likes += 1
+                post.save()
                 print("saved")
-        return HttpResponse(status=204)
+        return JsonResponse({
+            "likes": post.num_likes
+        }, safe=False)
 
     # Email must be via GET or PUT
     else:

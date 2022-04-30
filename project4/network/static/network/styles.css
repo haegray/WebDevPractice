@@ -1,7 +1,116 @@
+@keyframes mymoveup {
+    from {bottom: 0%}
+    to {bottom: 50%;}
+  }
+
+  @keyframes mymovedown{
+    from {bottom: 50%;}
+    to {bottom: 0%;}
+  }
+
 #like-button{
     display:none;
+}
+
+#compose-button{
+    float: right;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    font-size: 30px;
+    line-height: 25px;
+    padding-bottom: 5px;
 }
 
 .checked{
     color: red;
 }
+
+.pagination{
+    position: absolute;
+    margin: auto;
+    align-items: center;
+    margin-left: 200px;
+    top: 60px;
+}
+
+#tweets-view{
+    margin: auto;
+    width: 600px;
+    padding: 20px;
+    z-index: -1;
+}
+
+#post-row{
+    padding-left: 5px;
+    margin-left: 80px;    
+}
+
+#likes-row{
+    padding-left: 5px;
+    margin-left: 80px;    
+}
+
+#id-row{
+    padding-top: 5px;  
+}
+
+#timestamp-col{
+    padding-top: 25px;
+    padding-right:0px;
+    right:-60px;
+}
+
+.container{
+    position: relative;
+    background-color: lightblue;
+    margin: 10px;
+    margin-left: -100px;
+    width: 550px;
+    align-items: center;
+}
+
+#compose-view{
+    bottom:300px;
+    left:35%;
+    height: 170px;
+    width: 350px;
+    text-align: center;
+    z-index: 5;
+    background-color: rgba(245,222,179,0.5);
+    position: absolute;
+    display: none;
+}
+
+.forwards{
+    animation-name: mymoveup;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
+}
+
+.backwards{
+    animation-name: mymovedown;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
+}
+
+form {
+    
+    transform : translate(0, 15%);
+    justify-content: center;
+}
+
+#compose-view.closed {
+	max-height: 0;
+}
+
+
+textarea {
+    margin:auto;
+    padding: 20px;
+    max-height: 100px;
+    max-width: 300px;
+}
+

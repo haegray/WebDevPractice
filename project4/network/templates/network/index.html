@@ -6,19 +6,37 @@
 {% if user.is_authenticated %}
 
 <div id="tweets-view">
+    <div class="pagination">
+        <span class="step-links">
+            {% if feed.has_previous %}
+                <a href="?page={{ feed.previous_page_number }}">&laquo;</a>
+            {% endif %}
+    
+            <span class="current">
+             {{ feed.number }}
+            </span>
+    
+            {% if feed.has_next %}
+                <a href="?page={{ feed.next_page_number }}">&raquo;</a>
+            {% endif %}
+        </span>
+        </div>
+
+
     <ul>
         {% for post, liked in feed %}
         <div class="container" id = "{{post.id}}"}>
-            <div class="row">
+            <div class="row" id = "id-row">
                 <div class="col-6">
                     <img src="{{ post.poster.photo.url }}" alt="img" width="80"> <a href ="{% url 'profile' %}">{{post.poster}}</a> <br/>
                 </div>
-                <div class="col-6">
+                <div class="col-5" id = "timestamp-col">
                     {{post.time_stamp}} 
                 </div>
             </div>
-            <div class="row">{{post.post}}</div>
-            <div class="row">
+            <div class="row" id = "post-row">{{post.post}}</div>
+            <div class="row" id = "likes-row">
+                <div id="post-likes"> {{post.num_likes}} </div>
                 {% if not liked %}
                     <label for="like-button" id="label-like-button"><input type="checkbox" id="like-button">&#9829</label>
                 {% else %}
@@ -27,18 +45,23 @@
             </div>
         </div> 
         {% endfor %}
+
+        <input class = "submit_button" id="compose-button" type = "submit" value = "+">
     </ul>
-    Page {{ feed.number }} of {{ feed.paginator.num_pages }}.
-</div>
+
+
     
 
+</div>
 
 
-<div id="compose-view">
-<form action="{% url 'index' %}" method="post" >
+
+
+<div id="compose-view" class="backwards">
+<form action="{% url 'index' %}" method="post" id="tweet-form" >
     {% csrf_token %}
     {{form.as_table}}
-    <input class = "submit_button" type = "submit">
+    <input class = "submit_button" id="tweet-button" type = "submit" value = "Post">
 </form>
 </div>
 {% endif %}

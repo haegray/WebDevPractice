@@ -17,6 +17,7 @@ class Post(models.Model):
     poster = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="posts")
     post = models.CharField(max_length=128)
     time_stamp = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    num_likes = models.IntegerField(default=0)
     
     def __str__(self):
         return f" {self.id} -- {self.poster}: {self.post} at {self.time_stamp}"
@@ -27,6 +28,7 @@ class Post(models.Model):
             "poster": self.poster.username,
             "post": self.post,
             "time_stamp": self.time_stamp.strftime("%b %d %Y, %I:%M %p"),
+            "num_likes": self.num_likes
         }
 
 class Like(models.Model):
