@@ -44,7 +44,7 @@ class PostForm(ModelForm):
         self.cleaned_data['poster'] = self.user
         
         post = self.cleaned_data.get('post')
-        if len(post) > 128:
+        if post is None or len(post) > 128:
             self._errors['post'] = self.error_class([
                 'Post cannot be longer than 128 characters.' 
             ])
@@ -60,13 +60,12 @@ def index(request):
         if form.is_valid():
             form.save()
         form = PostForm()
+        return HttpResponseRedirect(reverse("index"))
 
-    p = []
-    print("Request user id is ", request.user.id)
     if request.user.id != None:
         user = User.objects.get(username = request.user)
         feed_following = user.following
-        feed = [Post.objects.filter(poster=user) for user in feed_following.all()] + list(Post.objects.filter(poster=request.user))
+        feed = [post for post in Post.objects.all()]
         feed = sorted(feed, key=lambda x: x.time_stamp, reverse=True)
         feed_likes = [Like.objects.filter(post=post, liker=request.user).exists() for post in feed]
         feed = list(zip(feed, feed_likes))
@@ -77,7 +76,25 @@ def index(request):
         
     return render(request, "network/index.html", {
         "feed": feed,
-        "form": form
+        "form": form,
+        "current_user": request.user
+    })
+
+def profile(request, profile):
+    if User.objects.filter(username = profile).exists():
+        user = User.objects.get(username = profile)
+        feed = list(Post.objects.filter(poster=user))
+        feed = sorted(feed, key=lambda x: x.time_stamp, reverse=True)
+        feed_likes = [Like.objects.filter(post=post, liker=request.user).exists() for post in feed]
+        feed = list(zip(feed, feed_likes))
+
+        p = Paginator(feed, 4)
+        page_number = request.GET.get('page')
+        feed = p.get_page(page_number)
+        
+    return render(request, "network/profile.html", {
+        "feed": feed,
+        "current_user": user
     })
 
 @csrf_exempt
@@ -86,7 +103,7 @@ def posts(request, post_id):
     print("Post id ", post_id)
     # Query for requested email
     try:
-        post = Post.objects.get(poster=request.user, pk=post_id)
+        post = Post.objects.get(id=post_id)
         print("Blah")
     except Post.DoesNotExist:
         print("orange")
@@ -118,8 +135,6 @@ def posts(request, post_id):
             "error": "GET or PUT request required."
         }, status=400)
 
-def profile_view(request):
-   return render(request, "network/profile.html") 
 
 def login_view(request):
     if request.method == "POST":

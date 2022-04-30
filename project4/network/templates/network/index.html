@@ -5,70 +5,83 @@
 
 {% if user.is_authenticated %}
 
-<div id="tweets-view">
-    <div class="pagination">
-        <span class="step-links">
-            {% if feed.has_previous %}
-                <a href="?page={{ feed.previous_page_number }}">&laquo;</a>
-            {% endif %}
-    
-            <span class="current">
-             {{ feed.number }}
-            </span>
-    
-            {% if feed.has_next %}
-                <a href="?page={{ feed.next_page_number }}">&raquo;</a>
-            {% endif %}
-        </span>
+<div class="row">
+    <div class="col-4 pt-2">
+        <p class="float-right mr-5" id="profile-id">
+            <img src="{{ current_user.photo.url }}" alt="img" width="80"> <a
+                href="{% url 'profile' current_user %}">{{current_user.username}}</a> <br />
+        </p>
+    </div>
+    <div class="col-4">
+        <div id="tweets-view">
+            <div class="row justify-content-center" id="nav-row">
+
+                <span class="step-links">
+                    {% if feed.has_previous %}
+                    <a href="?page={{ feed.previous_page_number }}">&laquo;</a>
+                    {% endif %}
+
+                    <span class="current">
+                        {{ feed.number }}
+                    </span>
+
+                    {% if feed.has_next %}
+                    <a href="?page={{ feed.next_page_number }}">&raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="row">
+                <ul>
+                    {% for post, liked in feed %}
+                    <div class="container" id="{{post.id}}" }>
+                        <div class="row pt-3 mt-2" id="id-row">
+                            <div class="col-6">
+                                <img src="{{ post.poster.photo.url }}" alt="img" width="50">
+                                <a href="{% url 'profile' post.poster %}">{{post.poster}}</a> <br />
+                            </div>
+                            <div class="col-6 mt-2" id="timestamp-col">
+                                <p class="float-right">
+                                    {{post.time_stamp}}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row ml-5 pt-2" id="post-row">{{post.post}}</div>
+                        <div class="row ml-5 pt-1" id="likes-row">
+                            <div id="post-likes"> {{post.num_likes}} </div>
+                            {% if not liked %}
+                            <label for="like-button" id="label-like-button"><input type="checkbox"
+                                    id="like-button">&#9829</label>
+                            {% else %}
+                            <label for="like-button" id="label-like-button" class="checked"><input type="checkbox"
+                                    id="like-button">&#9829</label>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-
-
-    <ul>
-        {% for post, liked in feed %}
-        <div class="container" id = "{{post.id}}"}>
-            <div class="row" id = "id-row">
-                <div class="col-6">
-                    <img src="{{ post.poster.photo.url }}" alt="img" width="80"> <a href ="{% url 'profile' %}">{{post.poster}}</a> <br/>
-                </div>
-                <div class="col-5" id = "timestamp-col">
-                    {{post.time_stamp}} 
-                </div>
-            </div>
-            <div class="row" id = "post-row">{{post.post}}</div>
-            <div class="row" id = "likes-row">
-                <div id="post-likes"> {{post.num_likes}} </div>
-                {% if not liked %}
-                    <label for="like-button" id="label-like-button"><input type="checkbox" id="like-button">&#9829</label>
-                {% else %}
-                    <label for="like-button" id="label-like-button" class="checked"><input type="checkbox" id="like-button">&#9829</label>
-                {% endif %}
-            </div>
-        </div> 
-        {% endfor %}
-
-        <input class = "submit_button" id="compose-button" type = "submit" value = "+">
-    </ul>
-
-
-    
-
+        <div class="row justify-content-center">
+            <input class="submit_button" id="compose-button" type="submit" value="+">
+        </div>
+    </div>
 </div>
-
-
-
 
 <div id="compose-view" class="backwards">
-<form action="{% url 'index' %}" method="post" id="tweet-form" >
-    {% csrf_token %}
-    {{form.as_table}}
-    <input class = "submit_button" id="tweet-button" type = "submit" value = "Post">
-</form>
+    <form action="{% url 'index' %}" method="post" id="tweet-form">
+        {% csrf_token %}
+        {{form.as_table}}
+        <input class="submit_button" id="tweet-button" type="submit" value="Post">
+    </form>
 </div>
+
+
+
 {% endif %}
 
 {% endblock %}
 
 {% block script %}
-    <script src="{% static 'network/network.js' %}"></script>
+<script src="{% static 'network/network.js' %}"></script>
 {% endblock %}
-
