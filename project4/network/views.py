@@ -52,9 +52,10 @@ class PostForm(ModelForm):
         return self.cleaned_data
 
 
-def index(request):
+def index(request, which=''):
     form = PostForm()
     feed = []
+    num_followers = 0
     if request.method == "POST":
         form = PostForm(request.POST, user=request.user)
         if form.is_valid():
@@ -66,6 +67,14 @@ def index(request):
         user = User.objects.get(username = request.user)
         feed_following = user.following
         feed = [post for post in Post.objects.all()]
+        print("Which is ", which)
+        if which == 'following':
+            following = [User.objects.filter(username=ft) for ft in user.following.all()]
+            print("Following", following)
+            if len(following):
+                feed = [post for post in feed if post.poster in following[0].all()]
+            else:
+                feed = []
         feed = sorted(feed, key=lambda x: x.time_stamp, reverse=True)
         feed_likes = [Like.objects.filter(post=post, liker=request.user).exists() for post in feed]
         feed = list(zip(feed, feed_likes))
@@ -73,14 +82,40 @@ def index(request):
         p = Paginator(feed, 4)
         page_number = request.GET.get('page')
         feed = p.get_page(page_number)
+        num_followers = len(request.user.followers.all())
         
     return render(request, "network/index.html", {
         "feed": feed,
         "form": form,
+        "num_followers": num_followers,
         "current_user": request.user
     })
 
+@csrf_exempt
+@login_required
 def profile(request, profile):
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        if data.get("profile") is not None:
+            f_user = User.objects.get(username=profile)
+            if User.objects.get(username=request.user).following.filter(username=profile).exists():
+                User.objects.get(username=request.user).following.remove(f_user)
+                User.objects.get(username=request.user).save()
+                User.objects.get(username=profile).followers.remove(request.user)
+                User.objects.get(username=profile).save()
+                following = 'Follow'
+            else:
+                User.objects.get(username=request.user).following.add(f_user)
+                User.objects.get(username=request.user).save()
+                User.objects.get(username=profile).followers.add(request.user)
+                User.objects.get(username=profile).save()
+                following = 'Unfollow'
+                
+        return JsonResponse({
+            "num_followers": len(f_user.followers.all()),
+            "following": following
+        }, safe=False)
+
     if User.objects.filter(username = profile).exists():
         user = User.objects.get(username = profile)
         feed = list(Post.objects.filter(poster=user))
@@ -88,13 +123,21 @@ def profile(request, profile):
         feed_likes = [Like.objects.filter(post=post, liker=request.user).exists() for post in feed]
         feed = list(zip(feed, feed_likes))
 
+        following = User.objects.get(username=request.user).following.filter(username=profile).exists()
+        if following:
+            following = "Unfollow"
+        else:
+            following = "Follow"
+
         p = Paginator(feed, 4)
         page_number = request.GET.get('page')
         feed = p.get_page(page_number)
         
     return render(request, "network/profile.html", {
         "feed": feed,
-        "current_user": user
+        "current_user": user,
+        "num_followers": len(user.followers.all()),
+        "following": following
     })
 
 @csrf_exempt

@@ -11,4 +11,5 @@ urlpatterns = [
     path("register", views.register, name="register"),
     path("profile/<str:profile>", views.profile, name="profile"),
     path("posts/<int:post_id>", views.posts, name="posts"),
+    path("<str:which>", views.index, name="index")
 ] 

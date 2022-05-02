@@ -51,21 +51,22 @@ ul {
     display: block;
 }
 
-#profile-id {
+.profile-id {
     display: block;
     top: 20px;
     left: 100px;
 }
 
-.container {
+.post {
     position: relative;
-    background-color: lightblue;
+    background-color: rgb(231,254,255);
     align-items: center;
+    border-radius: 10px;
 }
 
 #compose-view {
     bottom: 300px;
-    left: 35%;
+    left: 37%;
     height: 170px;
     width: 350px;
     text-align: center;
